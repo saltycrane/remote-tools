@@ -1,0 +1,10 @@
+
+scp_r2r.py:
+    Use scp to copy files bewteen two remote hosts directly.
+    Copies the ssh key needed to get from host1 to host2.
+    Requires ~/.ssh/config file
+
+    Usage: scp_r2r.py [options] host1:path1 host2:path2
+
+    Dependencies:
+    - paramiko
