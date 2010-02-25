@@ -8,10 +8,10 @@ import re
 import sys
 from paramiko import SSHClient, SSHConfig
 
-def rml_cat(host, glob, ascending=False):
+def rml_cat(host, glob, skip_files=0):
     rml = RemoteMultiLog()
     rml.connect(host)
-    lines = rml.get_lines(glob)
+    lines = rml.get_lines(glob, skip_files)
     for line in lines:
         print line.rstrip()
     rml.close()
@@ -29,24 +29,22 @@ class RemoteMultiLog(object):
         ssh.connect(o['hostname'], username=o['user'], key_filename=o['identityfile'])
         self.sftp_client = ssh.open_sftp()
 
-    def get_lines(self, glob, ascending=False):
+    def get_lines(self, glob, skip_files=0):
         """wildcards only allowed in filename (not path)
         """
         (dirname, filepattern) = os.path.split(glob)
         filelist = self.sftp_client.listdir(dirname)
         filelist = fnmatch.filter(filelist, filepattern)
         filelist = [os.path.join(dirname, filename) for filename in filelist]
-        filelist = sorted(filelist, self.sort_by_integer_suffix, reverse=ascending)
+        filelist = sorted(filelist, self.sort_by_integer_suffix)
 
-        for filepath in filelist:
+        for filepath in filelist[skip_files:]:
             sys.stderr.write("Processing %s...\n" % filepath)
             sftp_file = self.sftp_client.open(filepath)
             if filepath.endswith('.gz'):
                 fh = gzip.GzipFile(fileobj=sftp_file)
             else:
                 fh = sftp_file
-            if not ascending:
-                fh = reversed(fh.readlines())
             for line in fh:
                 yield line
             sftp_file.close()
@@ -69,4 +67,4 @@ class RemoteMultiLog(object):
             else:
                 suf = 0
             return suf
-        return get_suffix(a) - get_suffix(b)
+        return get_suffix(b) - get_suffix(a)
