@@ -10,7 +10,7 @@ scp_r2r.py:
     - paramiko
 
 rml_cat.py:
-    Print lines in descending order for all files matching
+    Print lines in ascending order for all files matching
     glob pattern on a remote host
 
     Usage: rml_cat.py [options] host:glob
