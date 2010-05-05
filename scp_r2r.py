@@ -17,6 +17,11 @@ def main():
                       dest="config_file",
                       default="%s/.ssh/config" % os.environ['HOME'],
                       help="SSH config file (default: ~/.ssh/config)",)
+    parser.add_option("--scp-options",
+                      action="store",
+                      dest="scp_options",
+                      default="",
+                      help="string of options (in quotes) passed directy to the scp command",)
     (options, args) = parser.parse_args()
     host1, path1 = args[0].split(':', 1)
     host2, path2 = args[1].split(':', 1)
@@ -33,8 +38,11 @@ def main():
     # copy actual file
     ssh_options = ' -o'.join(['='.join([k, v]) for k, v in o.iteritems()
                               if k != 'hostname' and k != 'identityfile'])
-    run('ssh %s scp -p -i %s -oStrictHostKeyChecking=no -o%s %s %s:%s' % (
-            host1, keyfile_remote, ssh_options, path1, o['hostname'], path2))
+    if ssh_options:
+        ssh_options = '-o' + ssh_options
+    run('ssh %s scp %s -i %s -oStrictHostKeyChecking=no %s %s %s:%s' % (
+            host1, options.scp_options, keyfile_remote, ssh_options, path1,
+            o['hostname'], path2))
 
 def run(cmd):
     print cmd
