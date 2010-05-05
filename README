@@ -6,6 +6,14 @@ scp_r2r.py:
 
     Usage: scp_r2r.py [options] host1:path1 host2:path2
 
+    Options:
+      -h, --help            show this help message and exit
+      -F CONFIG_FILE, --config-file=CONFIG_FILE
+                            SSH config file (default: ~/.ssh/config)
+      --scp-options=SCP_OPTIONS
+                            string of options (in quotes) passed directy to the
+                            scp command
+
     Dependencies:
     - paramiko
 
